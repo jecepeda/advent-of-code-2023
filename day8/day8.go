@@ -89,36 +89,12 @@ func (p Problem) Solve(startingPoint, endingLetter string) int {
 	}
 }
 
-func (p Problem) Solve1(startingPoint, endingPoint string) int {
-	var (
-		result       int    = 0
-		i            int    = 0
-		currentPoint string = startingPoint
-		currentNode  Node
-	)
-	for {
-		result++
-		whereToGo := p.Instructions[i]
-		if whereToGo == Left {
-			currentNode = p.Map[currentPoint]
-			currentPoint = currentNode.Left
-		} else {
-			currentNode = p.Map[currentPoint]
-			currentPoint = currentNode.Right
-		}
-		if currentPoint == endingPoint {
-			return result
-		}
-		i = (i + 1) % len(p.Instructions)
-	}
-}
-
 func Part1(filename string) (int, error) {
 	problem, err := ReadFile(filename)
 	if err != nil {
 		return 0, err
 	}
-	return problem.Solve1("AAA", "ZZZ"), nil
+	return problem.Solve("AAA", "ZZZ"), nil
 }
 
 func Part2(filename string) (int, error) {
