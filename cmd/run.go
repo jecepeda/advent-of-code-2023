@@ -15,6 +15,7 @@ import (
 	"github.com/jecepeda/advent-of-code-2023/day5"
 	"github.com/jecepeda/advent-of-code-2023/day6"
 	"github.com/jecepeda/advent-of-code-2023/day7"
+	"github.com/jecepeda/advent-of-code-2023/day8"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
@@ -112,6 +113,18 @@ var dayFunctions = map[string][]execFunc{
 			filename:    "day7/input.txt",
 			function:    day7.Part2,
 			description: "Day 7 Part 2",
+		},
+	},
+	"8": {
+		execFunc{
+			filename:    "day8/input.txt",
+			function:    day8.Part1,
+			description: "Day 8 Part 1",
+		},
+		execFunc{
+			filename:    "day8/input.txt",
+			function:    day8.Part2,
+			description: "Day 8 Part 2",
 		},
 	},
 }
