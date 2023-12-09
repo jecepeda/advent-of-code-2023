@@ -89,7 +89,6 @@ var dayFunctions = map[string][]execFunc{
 			filename:    "day5/input.txt",
 			function:    day5.Part2,
 			description: "Day 5 Part 2",
-			longRunning: true,
 		},
 	},
 	"6": {

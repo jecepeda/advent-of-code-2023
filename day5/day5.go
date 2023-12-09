@@ -1,8 +1,6 @@
 package day5
 
 import (
-	"fmt"
-	"math"
 	"sort"
 	"strings"
 
@@ -10,25 +8,81 @@ import (
 )
 
 type Almanac struct {
-	Seeds      []int
-	SeedRanges []SeedRange
-	Steps      []Step
+	Seeds SeedRanges
+	Steps []Step
 }
 
-type SeedRange struct {
-	SourceStart int
-	SourceEnd   int
+func (a *Almanac) Solve() int {
+	projections := SeedRanges{}
+	for _, s := range a.Seeds {
+		seed := SeedRanges{s}
+		for _, step := range a.Steps {
+			seed = step.Apply(seed)
+		}
+		projections = append(projections, seed...)
+	}
+	sort.Sort(projections)
+	return projections[0][0]
+}
+
+type SeedRange [2]int
+
+type SeedRanges []SeedRange
+
+func (p SeedRanges) Len() int {
+	return len(p)
+}
+
+func (p SeedRanges) Less(i, j int) bool {
+	return p[i][0] < p[j][0]
+}
+
+func (p SeedRanges) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
 }
 
 type Step struct {
-	// <source> -> <destination>
 	Source      string
 	Destination string
 	Rules       Rules
 }
 
-func (s Step) String() string {
-	return fmt.Sprintf("source=%s destination=%s", s.Source, s.Destination)
+func getOverlapping(a, b [2]int) *[2]int {
+	left, right := max(a[0], b[0]), min(a[1], b[1])
+	if left <= right {
+		return &[2]int{left, right}
+	}
+	return nil
+}
+
+func getMapping(seed SeedRange, rule Rule) SeedRange {
+	offset := rule.Destination[0] - rule.Source[0]
+
+	return SeedRange{seed[0] + offset, seed[1] + offset}
+}
+
+func (s Step) Apply(seeds SeedRanges) SeedRanges {
+	result := SeedRanges{}
+	for _, seed := range seeds {
+		partial := SeedRanges{}
+		for _, rule := range s.Rules {
+			overlapping := getOverlapping(seed, rule.Source)
+			if overlapping != nil {
+				l, r := overlapping[0], overlapping[1]
+				mapping := getMapping(SeedRange{l, r}, rule)
+				partial = append(partial, mapping)
+				if seed[0] < l {
+					partial = append(partial, SeedRange{seed[0], l})
+				}
+				seed = SeedRange{r, seed[1]}
+			}
+		}
+		if seed[0] < seed[1] || len(partial) == 0 {
+			partial = append(partial, seed)
+		}
+		result = append(result, partial...)
+	}
+	return result
 }
 
 type Rules []Rule
@@ -38,86 +92,39 @@ func (p Rules) Len() int {
 }
 
 func (p Rules) Less(i, j int) bool {
-	return p[i].SourceStart < p[j].SourceStart
+	return p[i].Source[0] < p[j].Source[0]
 }
 
 func (p Rules) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
 }
 
+type Rule struct {
+	Source      [2]int
+	Destination [2]int
+}
+
 func (s *Step) ReOrder() {
 	sort.Sort(s.Rules)
 }
 
-func (s Step) Apply(value int) int {
-	for _, rule := range s.Rules {
-		if value < rule.SourceStart || value > (rule.SourceStart+(rule.Range-1)) {
-			continue
-		}
-		return rule.DestinationStart + (value - rule.SourceStart)
-	}
-	return -1
-}
-
-type Rule struct {
-	// <source> <destination> <range>
-	// 50 100 10 would turn into
-	// [50-60] [100-100]
-	SourceStart      int
-	DestinationStart int
-	Range            int
-}
-
-func (r Rule) String() string {
-	return fmt.Sprintf("start=%d destination=%d range=%d", r.SourceStart, r.DestinationStart, r.Range)
-}
-
 func Part1(filename string) (int, error) {
-	almanac, err := ParseFile(filename)
+	almanac, err := ParseFile(filename, false)
 	if err != nil {
 		return 0, err
 	}
-	result := math.MaxInt
-	for _, seed := range almanac.Seeds {
-		partial := seed
-		for _, step := range almanac.Steps {
-			newPartial := step.Apply(partial)
-			if newPartial != -1 {
-				partial = newPartial
-			}
-		}
-		if partial < result {
-			result = partial
-		}
-	}
-	return result, nil
+	return almanac.Solve(), nil
 }
 
 func Part2(filename string) (int, error) {
-	almanac, err := ParseFile(filename)
+	almanac, err := ParseFile(filename, true)
 	if err != nil {
 		return 0, err
 	}
-	result := math.MaxInt
-	var partial, newPartial int
-	for _, seedRange := range almanac.SeedRanges {
-		for i := seedRange.SourceStart; i < seedRange.SourceEnd; i++ {
-			partial = i
-			for _, step := range almanac.Steps {
-				newPartial = step.Apply(partial)
-				if newPartial != -1 {
-					partial = newPartial
-				}
-			}
-			if partial < result {
-				result = partial
-			}
-		}
-	}
-	return result, nil
+	return almanac.Solve(), nil
 }
 
-func ParseFile(filename string) (*Almanac, error) {
+func ParseFile(filename string, isRange bool) (*Almanac, error) {
 	almanac := Almanac{}
 
 	s, err := utils.ReadFile(filename)
@@ -133,7 +140,15 @@ func ParseFile(filename string) (*Almanac, error) {
 			if err != nil {
 				return nil, err
 			}
-			almanac.Seeds = seeds
+			if isRange {
+				for i := 0; i < len(seeds); i += 2 {
+					almanac.Seeds = append(almanac.Seeds, SeedRange{seeds[i], seeds[i] + seeds[i+1] - 1})
+				}
+			} else {
+				for i := 0; i < len(seeds); i++ {
+					almanac.Seeds = append(almanac.Seeds, SeedRange{seeds[i], seeds[i]})
+				}
+			}
 		} else if strings.Contains(line, "map:") {
 			if step == nil {
 				step = &Step{}
@@ -148,12 +163,12 @@ func ParseFile(filename string) (*Almanac, error) {
 			if err != nil {
 				return nil, err
 			}
+			dst, src, rng := numbers[0], numbers[1], numbers[2]
 			step.Rules = append(
 				step.Rules,
 				Rule{
-					SourceStart:      numbers[1],
-					DestinationStart: numbers[0],
-					Range:            numbers[2], // -1 because the range is inclusive. 50 + 2 means 50-51
+					Source:      [2]int{src, src + rng - 1},
+					Destination: [2]int{dst, dst + rng - 1},
 				},
 			)
 		}
@@ -162,13 +177,6 @@ func ParseFile(filename string) (*Almanac, error) {
 
 	for i := 0; i < len(almanac.Steps); i++ {
 		almanac.Steps[i].ReOrder()
-	}
-
-	for i := 0; i < len(almanac.Seeds); i += 2 {
-		almanac.SeedRanges = append(almanac.SeedRanges, SeedRange{
-			SourceStart: almanac.Seeds[i],
-			SourceEnd:   almanac.Seeds[i] + almanac.Seeds[i+1],
-		})
 	}
 
 	return &almanac, nil
