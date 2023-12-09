@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 NAME HERE jcepeda@hey.com
-*/
 package cmd
 
 import (
