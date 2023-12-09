@@ -7,7 +7,7 @@ import (
 	"github.com/jecepeda/advent-of-code-2023/utils"
 )
 
-func difference(numbers []int) []int {
+func diff(numbers []int) []int {
 	var result = make([]int, len(numbers)-1)
 	for i := 1; i < len(numbers); i++ {
 		result[i-1] = numbers[i] - numbers[i-1]
@@ -28,18 +28,14 @@ func nextSequence(numbers []int) int {
 	if allZeroes(numbers) {
 		return 0
 	}
-	next := difference(numbers)
-	value := nextSequence(next)
-	return value + numbers[len(numbers)-1]
+	return numbers[len(numbers)-1] + nextSequence(diff(numbers))
 }
 
 func prevSequence(numbers []int) int {
 	if allZeroes(numbers) {
 		return 0
 	}
-	next := difference(numbers)
-	value := prevSequence(next)
-	return numbers[0] - value
+	return numbers[0] - prevSequence(diff(numbers))
 }
 
 func Part1(filename string) (int, error) {
