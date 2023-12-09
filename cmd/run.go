@@ -155,20 +155,26 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "This command runs the solution for any given day",
 	Run: func(cmd *cobra.Command, args []string) {
-		days := getDays()
+		var days []string
 		if len(args) > 0 {
+			if _, ok := dayFunctions[args[0]]; !ok {
+				fmt.Printf("Invalid day: %s\n", args[0])
+				return
+			}
 			days = []string{args[0]}
+		} else {
+			days = getDays()
 		}
 		force := cmd.Flag("force").Value.String() == "true"
 		w := table.NewWriter()
 		w.AppendHeader(table.Row{"Title", "Time", "Result", "Notes"})
 		for _, day := range days {
 			for _, f := range dayFunctions[day] {
-				now := time.Now()
 				if !force && f.longRunning {
-					w.AppendRow(table.Row{f.description, time.Since(now), "SKIPPED", "use --force to run"})
+					w.AppendRow(table.Row{f.description, "0s", "SKIPPED", "use --force to run"})
 					continue
 				} else {
+					now := time.Now()
 					result, err := f.function(f.filename)
 					if err != nil {
 						fmt.Println(err)

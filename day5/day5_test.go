@@ -40,41 +40,41 @@ func TestSolve(t *testing.T) {
 				// 52 50 48
 				Rules: []Rule{
 					{
-						Source:      [2]int{98, 99},
-						Destination: [2]int{50, 51},
+						Source:      Range{98, 99},
+						Destination: Range{50, 51},
 					},
 					{
-						Source:      [2]int{50, 97},
-						Destination: [2]int{52, 100},
+						Source:      Range{50, 97},
+						Destination: Range{52, 100},
 					},
 				},
 			},
 		},
 	}
 	testCases := []struct {
-		SeedRange [2]int
+		SeedRange Range
 		Expected  int
 	}{
 		// 79 14 55 13
 		{
-			SeedRange: [2]int{79, 79},
+			SeedRange: Range{79, 79},
 			Expected:  81,
 		},
 		{
-			SeedRange: [2]int{14, 14},
+			SeedRange: Range{14, 14},
 			Expected:  14,
 		},
 		{
-			SeedRange: [2]int{55, 55},
+			SeedRange: Range{55, 55},
 			Expected:  57,
 		},
 		{
-			SeedRange: [2]int{13, 13},
+			SeedRange: Range{13, 13},
 			Expected:  13,
 		},
 	}
 	for _, testCase := range testCases {
-		almanac.Seeds = SeedRanges{testCase.SeedRange}
+		almanac.Seeds = []Range{testCase.SeedRange}
 		result := almanac.Solve()
 		require.Equal(t, testCase.Expected, result, "seed range %s", testCase.SeedRange)
 	}

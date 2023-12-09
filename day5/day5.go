@@ -8,73 +8,61 @@ import (
 )
 
 type Almanac struct {
-	Seeds SeedRanges
+	Seeds []Range
 	Steps []Step
 }
 
 func (a *Almanac) Solve() int {
-	projections := SeedRanges{}
+	projections := []Range{}
 	for _, s := range a.Seeds {
-		seed := SeedRanges{s}
+		seed := []Range{s}
 		for _, step := range a.Steps {
 			seed = step.Apply(seed)
 		}
 		projections = append(projections, seed...)
 	}
-	sort.Sort(projections)
+	sort.Slice(projections, func(i, j int) bool {
+		return projections[i][0] < projections[j][0]
+	})
 	return projections[0][0]
 }
 
-type SeedRange [2]int
-
-type SeedRanges []SeedRange
-
-func (p SeedRanges) Len() int {
-	return len(p)
-}
-
-func (p SeedRanges) Less(i, j int) bool {
-	return p[i][0] < p[j][0]
-}
-
-func (p SeedRanges) Swap(i, j int) {
-	p[i], p[j] = p[j], p[i]
-}
+type Range [2]int
 
 type Step struct {
 	Source      string
 	Destination string
-	Rules       Rules
+	Rules       []Rule
 }
 
-func getOverlapping(a, b [2]int) *[2]int {
+func getOverlapping(a, b Range) *Range {
 	left, right := max(a[0], b[0]), min(a[1], b[1])
 	if left <= right {
-		return &[2]int{left, right}
+		return &Range{left, right}
 	}
 	return nil
 }
 
-func getMapping(seed SeedRange, rule Rule) SeedRange {
+func getMapping(seed Range, rule Rule) Range {
 	offset := rule.Destination[0] - rule.Source[0]
 
-	return SeedRange{seed[0] + offset, seed[1] + offset}
+	return Range{seed[0] + offset, seed[1] + offset}
 }
 
-func (s Step) Apply(seeds SeedRanges) SeedRanges {
-	result := SeedRanges{}
+func (s Step) Apply(seeds []Range) []Range {
+	result := []Range{}
 	for _, seed := range seeds {
-		partial := SeedRanges{}
+		partial := []Range{}
 		for _, rule := range s.Rules {
 			overlapping := getOverlapping(seed, rule.Source)
 			if overlapping != nil {
 				l, r := overlapping[0], overlapping[1]
-				mapping := getMapping(SeedRange{l, r}, rule)
+				mapping := getMapping(Range{l, r}, rule)
 				partial = append(partial, mapping)
 				if seed[0] < l {
-					partial = append(partial, SeedRange{seed[0], l})
+					partial = append(partial, Range{seed[0], l})
 				}
-				seed = SeedRange{r, seed[1]}
+				seed = Range{r, seed[1]}
 			}
 		}
 		if seed[0] < seed[1] || len(partial) == 0 {
@@ -85,27 +73,15 @@ func (s Step) Apply(seeds SeedRanges) SeedRanges {
 	return result
 }
 
-type Rules []Rule
-
-func (p Rules) Len() int {
-	return len(p)
-}
-
-func (p Rules) Less(i, j int) bool {
-	return p[i].Source[0] < p[j].Source[0]
-}
-
-func (p Rules) Swap(i, j int) {
-	p[i], p[j] = p[j], p[i]
-}
-
 type Rule struct {
-	Source      [2]int
-	Destination [2]int
+	Source      Range
+	Destination Range
 }
 
 func (s *Step) ReOrder() {
-	sort.Sort(s.Rules)
+	sort.Slice(s.Rules, func(i, j int) bool {
+		return s.Rules[i].Source[0] < s.Rules[j].Source[0]
+	})
 }
 
 func Part1(filename string) (int, error) {
@@ -142,11 +118,11 @@ func ParseFile(filename string, isRange bool) (*Almanac, error) {
 			}
 			if isRange {
 				for i := 0; i < len(seeds); i += 2 {
-					almanac.Seeds = append(almanac.Seeds, SeedRange{seeds[i], seeds[i] + seeds[i+1] - 1})
+					almanac.Seeds = append(almanac.Seeds, Range{seeds[i], seeds[i] + seeds[i+1] - 1})
 				}
 			} else {
 				for i := 0; i < len(seeds); i++ {
-					almanac.Seeds = append(almanac.Seeds, SeedRange{seeds[i], seeds[i]})
+					almanac.Seeds = append(almanac.Seeds, Range{seeds[i], seeds[i]})
 				}
 			}
 		} else if strings.Contains(line, "map:") {
@@ -167,8 +143,8 @@ func ParseFile(filename string, isRange bool) (*Almanac, error) {
 			step.Rules = append(
 				step.Rules,
 				Rule{
-					Source:      [2]int{src, src + rng - 1},
-					Destination: [2]int{dst, dst + rng - 1},
+					Source:      Range{src, src + rng - 1},
+					Destination: Range{dst, dst + rng - 1},
 				},
 			)
 		}
