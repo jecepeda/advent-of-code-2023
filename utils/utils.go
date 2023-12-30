@@ -31,3 +31,10 @@ func ReadNumbers(line string) ([]int, error) {
 	}
 	return result, nil
 }
+
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}

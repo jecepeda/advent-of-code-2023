@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jecepeda/advent-of-code-2023/day1"
+	"github.com/jecepeda/advent-of-code-2023/day10"
 	"github.com/jecepeda/advent-of-code-2023/day2"
 	"github.com/jecepeda/advent-of-code-2023/day3"
 	"github.com/jecepeda/advent-of-code-2023/day4"
@@ -28,7 +29,7 @@ type execFunc struct {
 }
 
 var dayFunctions = map[string][]execFunc{
-	"1": {
+	"01": {
 		execFunc{
 			filename:    "day1/input.txt",
 			function:    day1.Part1,
@@ -40,7 +41,7 @@ var dayFunctions = map[string][]execFunc{
 			description: "Day 1 Part 2",
 		},
 	},
-	"2": {
+	"02": {
 		execFunc{
 			filename:    "day2/input.txt",
 			function:    day2.Part1,
@@ -52,7 +53,7 @@ var dayFunctions = map[string][]execFunc{
 			description: "Day 2 Part 2",
 		},
 	},
-	"3": {
+	"03": {
 		execFunc{
 			filename:    "day3/input.txt",
 			function:    day3.Part1,
@@ -64,7 +65,7 @@ var dayFunctions = map[string][]execFunc{
 			description: "Day 3 Part 2",
 		},
 	},
-	"4": {
+	"04": {
 		execFunc{
 			filename:    "day4/input.txt",
 			function:    day4.Part1,
@@ -76,7 +77,7 @@ var dayFunctions = map[string][]execFunc{
 			description: "Day 4 Part 2",
 		},
 	},
-	"5": {
+	"05": {
 		execFunc{
 			filename:    "day5/input.txt",
 			function:    day5.Part1,
@@ -88,7 +89,7 @@ var dayFunctions = map[string][]execFunc{
 			description: "Day 5 Part 2",
 		},
 	},
-	"6": {
+	"06": {
 		execFunc{
 			filename:    "day6/input.txt",
 			function:    day6.Part1,
@@ -100,7 +101,7 @@ var dayFunctions = map[string][]execFunc{
 			description: "Day 6 Part 2",
 		},
 	},
-	"7": {
+	"07": {
 		execFunc{
 			filename:    "day7/input.txt",
 			function:    day7.Part1,
@@ -112,7 +113,7 @@ var dayFunctions = map[string][]execFunc{
 			description: "Day 7 Part 2",
 		},
 	},
-	"8": {
+	"08": {
 		execFunc{
 			filename:    "day8/input.txt",
 			function:    day8.Part1,
@@ -124,7 +125,7 @@ var dayFunctions = map[string][]execFunc{
 			description: "Day 8 Part 2",
 		},
 	},
-	"9": {
+	"09": {
 		execFunc{
 			filename:    "day9/input.txt",
 			function:    day9.Part1,
@@ -134,6 +135,13 @@ var dayFunctions = map[string][]execFunc{
 			filename:    "day9/input.txt",
 			function:    day9.Part2,
 			description: "Day 9 Part 2",
+		},
+	},
+	"10": {
+		execFunc{
+			filename:    "day10/input.txt",
+			function:    day10.Part1,
+			description: "Day 10 Part 1",
 		},
 	},
 }
