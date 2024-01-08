@@ -33,4 +33,7 @@ go.work
 # Built Visual Studio Code Extensions
 *.vsix
 
+# profiling
+*.pprof
+
 advent-of-code-2023

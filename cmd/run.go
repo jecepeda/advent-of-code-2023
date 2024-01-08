@@ -8,6 +8,7 @@ import (
 	"github.com/jecepeda/advent-of-code-2023/day1"
 	"github.com/jecepeda/advent-of-code-2023/day10"
 	"github.com/jecepeda/advent-of-code-2023/day11"
+	"github.com/jecepeda/advent-of-code-2023/day12"
 	"github.com/jecepeda/advent-of-code-2023/day2"
 	"github.com/jecepeda/advent-of-code-2023/day3"
 	"github.com/jecepeda/advent-of-code-2023/day4"
@@ -155,6 +156,18 @@ var dayFunctions = map[string][]execFunc{
 			filename:    "day11/input.txt",
 			function:    day11.Part2,
 			description: "Day 11 Part 2",
+		},
+	},
+	"12": {
+		execFunc{
+			filename:    "day12/input.txt",
+			function:    day12.Part1,
+			description: "Day 12 Part 1",
+		},
+		execFunc{
+			filename:    "day12/input.txt",
+			function:    day12.Part2,
+			description: "Day 12 Part 2",
 		},
 	},
 }
